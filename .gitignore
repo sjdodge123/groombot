@@ -1,0 +1,31 @@
+---
+```gitignore
+# Local-only generated data (contains real issue data)
+local-cache/*
+input-output-data/*
+
+# Env / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Logs / temp
+*.log
+tmp/
