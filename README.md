@@ -1,6 +1,5 @@
-Groombot
-
-This repo exists to make Linear issues “model-ready” before you hand them off to a high-cost coding model like OpenAI Codex, Anthropic Claude, Google Gemini, or similar. Those models can burn expensive credits quickly when requirements are vague, tickets are underspecified, or scope is blurred. The goal here is to front-load clarity so implementation time is spent writing code—not asking basic questions.
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/e5bb79bf-08e7-4e14-8f7b-edb8a910e4be" />
+Groombot exists to make Linear issues “model-ready” before you hand them off to a high-cost coding model like OpenAI Codex, Anthropic Claude, Google Gemini, or similar. Those models can burn expensive credits quickly when requirements are vague, tickets are underspecified, or scope is blurred. The goal here is to front-load clarity so implementation time is spent writing code—not asking basic questions.
 
 The workflow uses a conversational chatbot to groom a single epic end-to-end: normalize titles, define crisp acceptance criteria, identify dependencies/unknowns, propose estimates, and produce a strictly-scoped patch back to Linear. By doing the “thinking and shaping” work with lower-cost interaction, you reduce churn, minimize rework, and maximize the value of every paid token/credit when you eventually switch to an implementation-focused model.
 
