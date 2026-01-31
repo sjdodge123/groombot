@@ -12,8 +12,6 @@ This repo contains:
 	•	scripts to apply a patch back to Linear (dry-run supported)
 	•	a ready-to-paste grooming_prompt.md for a fresh ChatGPT Desktop session
 
-Important: This tool requires a Linear API key in your local environment. Do not commit API keys, exports, patches, or cache files.
-
 ⸻
 
 More technically, what this tool does
