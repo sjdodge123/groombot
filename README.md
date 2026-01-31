@@ -36,18 +36,17 @@ Requirements
 First time setup
 
 Linear API key (local environment only)
-	1.	Create a Linear API key in Linear.
-	2.	Add it to your shell profile (example for zsh):
+1.	Create a Linear API key in Linear.
+2.	Add it to your shell profile (example for zsh):
 ``` bash
 echo 'export LINEAR_API_KEY="PASTE_YOUR_KEY_HERE"' >> ~/.zshrc
 source ~/.zshrc
 ```
-    3.	Confirm it’s available:
+3.	Confirm it’s available:
 ``` bash
 echo "$LINEAR_API_KEY"
 ```
 If that prints blank, fix your shell setup before continuing.
-
 ⸻
 
 Initialize local folders and permissions
