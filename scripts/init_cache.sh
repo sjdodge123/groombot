@@ -9,14 +9,14 @@ IO_DIR="${ROOT_DIR}/input-output-data"
 mkdir -p "${CACHE_DIR}"
 mkdir -p "${IO_DIR}"
 
-EPICS_FILE="${CACHE_DIR}/groomed_epics.json"
+PARENT_ISSUES_FILE="${CACHE_DIR}/groomed_parent_issues.json"
 ISSUES_FILE="${CACHE_DIR}/groomed_issues.json"
 
-if [[ ! -f "${EPICS_FILE}" ]]; then
-  printf '%s\n' '{ "epics": [] }' > "${EPICS_FILE}"
-  echo "Created ${EPICS_FILE}"
+if [[ ! -f "${PARENT_ISSUES_FILE}" ]]; then
+  printf '%s\n' '{ "parentIssues": [] }' > "${PARENT_ISSUES_FILE}"
+  echo "Created ${PARENT_ISSUES_FILE}"
 else
-  echo "Exists  ${EPICS_FILE}"
+  echo "Exists  ${PARENT_ISSUES_FILE}"
 fi
 
 if [[ ! -f "${ISSUES_FILE}" ]]; then

@@ -2,13 +2,13 @@
 
 Groombot exists to make Linear issues “model-ready” before you hand them off to a high-cost coding model like OpenAI Codex, Anthropic Claude, Google Gemini, or similar. Those models can burn expensive credits quickly when requirements are vague, tickets are underspecified, or scope is blurred. The goal here is to front-load clarity so implementation time is spent writing code—not asking basic questions.
 
-The workflow uses a conversational chatbot to groom a single epic end-to-end: normalize titles, define crisp acceptance criteria, identify dependencies/unknowns, propose estimates, and produce a strictly-scoped patch back to Linear. By doing the “thinking and shaping” work with lower-cost interaction, you reduce churn, minimize rework, and maximize the value of every paid token/credit when you eventually switch to an implementation-focused model.
+The workflow uses a conversational chatbot to groom a single parent issue end-to-end: normalize titles, define crisp acceptance criteria, identify dependencies/unknowns, propose estimates, and produce a strictly-scoped patch back to Linear. By doing the “thinking and shaping” work with lower-cost interaction, you reduce churn, minimize rework, and maximize the value of every paid token/credit when you eventually switch to an implementation-focused model.
 
-- A strict, single-epic grooming workflow for Linear using ChatGPT as the guided operator.
+- A strict, single parent issue grooming workflow for Linear using ChatGPT as the guided operator.
 
 This repo contains:
 	•	authoritative workflow documentation
-	•	scripts to export epic data from Linear
+	•	scripts to export parent issue data from Linear
 	•	scripts to apply a patch back to Linear (dry-run supported)
 	•	a ready-to-paste grooming_prompt.md for a fresh ChatGPT Desktop session
 
@@ -16,8 +16,8 @@ This repo contains:
 
 More technically, what this tool does
 
-For exactly one epic per session, this workflow:
-	1.	Exports the epic + sub-issues from Linear into epic_export.json
+For exactly one parent issue per session, this workflow:
+	1.	Exports the parent issue + sub-issues from Linear into parent_issue_export.json
 	2.	Guides grooming one sub-issue at a time
 	3.	Produces groom_patch.json (only real IDs, only intended changes)
 	4.	Optionally applies the patch back to Linear and generates apply_report.json
@@ -55,7 +55,7 @@ From the repo root:
 ``` bash
 source ~/.zshrc
 chmod +x ./scripts/init_cache.sh
-chmod +x ./scripts/export_epic.sh
+chmod +x ./scripts/export_parent_issue.sh
 chmod +x ./scripts/apply_patch.py
 ./scripts/init_cache.sh
 ```
@@ -77,7 +77,11 @@ Usage (ChatGPT Desktop workflow)
 3) Follow the agent instructions
 
 The agent will instruct you to:
-	•	export fresh data with export_epic.sh
-	•	upload input-output-data/epic_export.json
+	•	export fresh data with export_parent_issue.sh
+	•	upload input-output-data/parent_issue_export.json
 	•	groom one sub-issue at a time
 	•	produce input-output-data/groom_patch.json
+	•	if a split is confirmed, include createSubIssues in groom_patch.json and run scripts/create_sub_issues.py (see 06_CREATE_SUB_ISSUES.md)
+
+## Architecture anchor issue
+Groombot expects each Linear project to have a single top-level **Architecture Definition** issue. If it cannot be found, the operator should provide an `architecture.md` file so Groombot can create it (or provide the file each run). See `07_ARCHITECTURE_ANCHOR.md`.

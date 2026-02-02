@@ -1,7 +1,7 @@
 # Scripts Overview (Read This First)
 
 This folder contains the executable scripts used to:
-- export a single Linear epic + sub-issues
+- export a single Linear parent issue + sub-issues
 - apply a groomed patch back to Linear
 - initialize and update the local grooming cache
 
@@ -14,8 +14,8 @@ In an agent-led grooming session:
 - The agent is expected to instruct the human operator when to:
   - source ~/.zshrc
   - chmod scripts
-  - run export_epic.sh
-- The agent must wait for epic_export.json before grooming begins.
+  - run export_parent_issue.sh
+- The agent must wait for parent_issue_export.json before grooming begins.
 
 ---
 
@@ -41,7 +41,7 @@ Executable permissions may be lost if:
 Run these commands ANY TIME scripts change:
 
 chmod +x ./scripts/init_cache.sh
-chmod +x ./scripts/export_epic.sh
+chmod +x ./scripts/export_parent_issue.sh
 chmod +x ./scripts/apply_patch.py
 
 You can safely re-run these at any time.
@@ -54,34 +54,34 @@ Initialize the local grooming cache:
 ./scripts/init_cache.sh
 
 This creates (if missing):
-- local-cache/groomed_epics.json
+- local-cache/groomed_parent_issues.json
 - local-cache/groomed_issues.json
 
 These files MUST remain real-data-only (no examples).
 
 ---
 
-## Per-Epic Workflow (REPEAT FOR EACH EPIC)
+## Per-Parent issue Workflow (REPEAT FOR EACH PARENT ISSUE)
 
 ### Step 1 — Export current state from Linear
-Export ONE epic (parent issue) and its sub-issues:
+Export ONE parent issue (parent issue) and its sub-issues:
 
-./scripts/export_epic.sh ENG-123
+./scripts/export_parent_issue.sh ENG-123
 
-Replace `ENG-123` with the epic identifier.
+Replace `ENG-123` with the parent issue identifier.
 
 This writes:
-- epic_export.json (at the repo root)
+- parent_issue_export.json (at the repo root)
 
 ---
 
 ### Step 2 — Groom (ChatGPT / agent step)
 Upload:
 - the zipped `linear-grooming-kit/`
-- `epic_export.json`
+- `parent_issue_export.json`
 
 The agent will:
-- groom the epic and sub-issues
+- groom the parent issue and sub-issues
 - output `groom_patch.json`
 
 Save `groom_patch.json` locally.
@@ -93,13 +93,13 @@ Apply changes back to Linear and update cache:
 
 python3 ./scripts/apply_patch.py \
   --patch groom_patch.json \
-  --export epic_export.json
+  --export parent_issue_export.json
 
 This writes:
 - apply_report.json
 
 If ALL updates succeed, it automatically updates:
-- local-cache/groomed_epics.json
+- local-cache/groomed_parent_issues.json
 - local-cache/groomed_issues.json
 
 ---
@@ -110,7 +110,7 @@ To preview changes WITHOUT modifying Linear or cache:
 
 python3 ./scripts/apply_patch.py \
   --patch groom_patch.json \
-  --export epic_export.json \
+  --export parent_issue_export.json \
   --dry-run
 
 Dry runs do NOT update Linear or cache files.
@@ -130,11 +130,11 @@ Never manually edit cache files unless explicitly repairing state.
 
 ## Design Rules (Do Not Violate)
 
-- One epic per session.
+- One parent issue per session.
 - Always export fresh data before grooming.
 - Never store API keys in files or chat.
 - Cache files must only reflect real applied changes.
-- Always start the next epic in a new chat agent.
+- Always start the next parent issue in a new chat agent.
 
 ---
 
@@ -143,8 +143,46 @@ Never manually edit cache files unless explicitly repairing state.
 - [ ] source ~/.zshrc
 - [ ] chmod scripts if needed
 - [ ] ./scripts/init_cache.sh
-- [ ] ./scripts/export_epic.sh <EPIC>
-- [ ] Upload epic_export.json
+- [ ] ./scripts/export_parent_issue.sh <PARENT ISSUE>
+- [ ] Upload parent_issue_export.json
 - [ ] Groom + generate groom_patch.json
 - [ ] python3 ./scripts/apply_patch.py ...
 - [ ] Verify cache updated
+
+---
+
+## create_sub_issues.py (NEW)
+Creates new sub-issues under a parent issue when grooming confirms a split.
+
+Usage:
+```bash
+python3 ./scripts/create_sub_issues.py \
+  --patch ./input-output-data/groom_patch.json \
+  --export ./input-output-data/parent_issue_export.json \
+  --dry-run
+
+python3 ./scripts/create_sub_issues.py \
+  --patch ./input-output-data/groom_patch.json \
+  --export ./input-output-data/parent_issue_export.json
+```
+
+Outputs:
+- `./input-output-data/create_report.json`
+
+See `06_CREATE_SUB_ISSUES.md` for patch format.
+
+### Ensure Architecture Definition issue (project anchor)
+- `scripts/ensure_architecture_issue.py` — checks for (and can create) a top-level Architecture Definition issue in the project.
+  - Dry run:
+    ```bash
+    python3 ./scripts/ensure_architecture_issue.py \
+      --export ./input-output-data/parent_issue_export.json \
+      --dry-run
+    ```
+  - Create from file (only after operator confirmation):
+    ```bash
+    python3 ./scripts/ensure_architecture_issue.py \
+      --export ./input-output-data/parent_issue_export.json \
+      --architecture-file ./architecture.md
+    ```
+  - See `07_ARCHITECTURE_ANCHOR.md`.

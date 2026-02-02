@@ -59,24 +59,24 @@ def backoff_sleep(attempt: int) -> None:
     time.sleep(delay)
 
 def update_cache(cache_dir: str, export_data: Dict[str, Any], patch_data: Dict[str, Any], apply_report_path: str) -> None:
-    epics_path = os.path.join(cache_dir, "groomed_epics.json")
+    parent_issues_path = os.path.join(cache_dir, "groomed_parent_issues.json")
     issues_path = os.path.join(cache_dir, "groomed_issues.json")
 
     # load existing
-    epics = load_json(epics_path)
+    parent_issues = load_json(parent_issues_path)
     issues = load_json(issues_path)
 
-    epic = export_data["epic"]
-    epic_identifier = epic["identifier"]
-    epic_id = epic["id"]
+    parent_issue = export_data["parentIssue"]
+    parent_issue_identifier = parent_issue["identifier"]
+    parent_issue_id = parent_issue["id"]
 
     patch_hash = sha256_file(apply_report_path)  # tie cache to actual apply report
 
-    # record epic-level
-    epics["epics"].append({
-        "epicId": epic_id,
-        "epicIdentifier": epic_identifier,
-        "title": epic["title"],
+    # record parent_issue-level
+    parent_issues["parentIssues"].append({
+        "parentIssueId": parent_issue_id,
+        "parentIssueIdentifier": parent_issue_identifier,
+        "title": parent_issue["title"],
         "groomedAt": utc_now(),
         "status": "groomed",
         "appliedPatch": True,
@@ -93,7 +93,7 @@ def update_cache(cache_dir: str, export_data: Dict[str, Any], patch_data: Dict[s
     changed_by_id = {c["id"]: c for c in patch_data.get("changes", [])}
 
     # helper index of export issues
-    export_issues = [export_data["epic"]] + export_data.get("subIssues", [])
+    export_issues = [export_data["parentIssue"]] + export_data.get("subIssues", [])
     export_by_id = {it["id"]: it for it in export_issues}
 
     for issue_id, change in changed_by_id.items():
@@ -104,7 +104,7 @@ def update_cache(cache_dir: str, export_data: Dict[str, Any], patch_data: Dict[s
         issues["issues"].append({
             "id": issue_id,
             "identifier": change.get("identifier") or before.get("identifier"),
-            "parentEpicIdentifier": epic_identifier,
+            "parentIssueIdentifier": parent_issue_identifier,
             "groomedAt": utc_now(),
             "appliedPatch": True,
             "changedFields": changed_fields,
@@ -113,14 +113,14 @@ def update_cache(cache_dir: str, export_data: Dict[str, Any], patch_data: Dict[s
             "notes": None,
         })
 
-    save_json(epics_path, epics)
+    save_json(parent_issues_path, parent_issues)
     save_json(issues_path, issues)
-    print(f"Updated cache: {epics_path}, {issues_path}")
+    print(f"Updated cache: {parent_issues_path}, {issues_path}")
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--patch", required=True, help="Path to groom_patch.json")
-    parser.add_argument("--export", required=True, help="Path to epic_export.json (snapshot used for diff/cache)")
+    parser.add_argument("--export", required=True, help="Path to parent_issue_export.json (snapshot used for diff/cache)")
     parser.add_argument("--out", default=None, help="Path to apply_report.json output (default: alongside --export)")
     parser.add_argument("--cache-dir", default="local-cache", help="Cache directory (default: local-cache)")
     parser.add_argument("--dry-run", action="store_true", help="Do not apply changes; only print what would change")
@@ -184,8 +184,8 @@ def main() -> int:
     report = {
         "meta": {
             "appliedAt": utc_now(),
-            "epicIdentifier": (patch_data.get("meta") or {}).get("epicIdentifier") or export_data.get("meta", {}).get("epicIdentifier"),
-            "epicId": (patch_data.get("meta") or {}).get("epicId") or export_data.get("meta", {}).get("epicId"),
+            "parentIssueIdentifier": (patch_data.get("meta") or {}).get("parentIssueIdentifier") or export_data.get("meta", {}).get("parentIssueIdentifier"),
+            "parentIssueId": (patch_data.get("meta") or {}).get("parentIssueId") or export_data.get("meta", {}).get("parentIssueId"),
             "patchFileSha256": sha256_file(args.patch),
             "exportFileSha256": sha256_file(args.export),
             "dryRun": bool(args.dry_run),
